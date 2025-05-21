@@ -41,19 +41,54 @@ if (!raw) {
 raw = raw.replace(/\u007f/g, "\n");
 
 const js = await format(tsBlankSpace(raw), { parser: "babel", useTabs: true });
----
 
-<Tabs syncKey="workersExamples">
-	<TabItem label="JavaScript" icon="seti:javascript">
-		<Code
-			{...code}
-			lang="js"
-			code={js}
-			title={filename?.replace(".ts", ".js")}
-			meta={playground ? "playground" : undefined}
-		/>
-	</TabItem>
-	<TabItem label="TypeScript" icon="seti:typescript">
-		<Code {...code} lang="ts" code={raw} title={filename} />
-	</TabItem>
-</Tabs>
+const includeTabsDefinition = copy.attributes["omit-tabs"] !== "true";
+
+// Define tab config array
+const tabs = [
+  {
+    label: "JavaScript",
+    icon: "seti:javascript",
+    lang: "js",
+    code: js,
+    title: filename?.replace(".ts", ".js"),
+    meta: playground ? "playground" : undefined,
+  },
+  {
+    label: "TypeScript",
+    icon: "seti:typescript",
+    lang: "ts",
+    code: raw,
+    title: filename,
+  },
+] as const;
+---
+{includeTabsDefinition ? (
+  <Tabs syncKey="workersExamples">
+    {tabs.map(tab => (
+      <TabItem label={tab.label} icon={tab.icon}>
+        <Code
+          {...code}
+          lang={tab.lang}
+          code={tab.code}
+          title={tab.title}
+          meta={tab.meta}
+        />
+      </TabItem>
+    ))}
+  </Tabs>
+) : (
+  <>
+    {tabs.map(tab => (
+      <TabItem label={tab.label} icon={tab.icon}>
+        <Code
+          {...code}
+          lang={tab.lang}
+          code={tab.code}
+          title={tab.title}
+          meta={tab.meta}
+        />
+      </TabItem>
+    ))}
+  </>
+)}
